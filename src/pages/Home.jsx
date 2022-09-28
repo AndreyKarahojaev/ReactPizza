@@ -17,15 +17,15 @@ export const Home = () => {
 
       fetch('https://6331b2413ea4956cfb652835.mockapi.io/items').then((res) => {
         return res.json();
-      }).then((arr) => 
-      { 
+      }).then((arr) => {
         setItems(arr);
         setIsLoading(false)
-      })
+      });
+      window.scrollTo(0, 0);
     }, [items]);
 
   return (
-    <>
+    <div className="container">
       <div className="content__top">
         <Categories />
         <Sort />
@@ -48,7 +48,7 @@ export const Home = () => {
           ))
         }
       </div>
-    </>
+    </div>
   )
 
 }
