@@ -9,26 +9,41 @@ export const Home = () => {
 
   
   const [items, setItems] = React.useState([]);
-  const [isLoading, setIsLoading] = React.useState(true)
+  const [isLoading, setIsLoading] = React.useState(true);
+
+  const [categoryId, setCategoryId] = React.useState(0);
+  const [sortType, setSortType] = React.useState({
+    name: 'популярности',
+    sortProperty: 'rating',
+  });
 
     //https://6331b2413ea4956cfb652835.mockapi.io/items
 
     React.useEffect(() => {
+      setIsLoading(true);
 
-      fetch('https://6331b2413ea4956cfb652835.mockapi.io/items').then((res) => {
-        return res.json();
-      }).then((arr) => {
+      const category = categoryId > 0 ? `category=${categoryId}` : ''; // генерация категорий
+      const sortBy = sortType.sortProperty.replace('-', ''); // сортирую по параметрам, по умолчаюнию популяр.
+      const order = sortType.sortProperty.includes('-') ? 'asc' : 'desc'; // сортировка по возрастанию и убыванию mocApi
+
+
+      fetch(
+        `https://6331b2413ea4956cfb652835.mockapi.io/items?
+        ${category}&sortBy=${sortBy}&order=desc${order}`,
+      )
+        .then((res) => res.json())
+        .then((arr) => {
         setItems(arr);
         setIsLoading(false)
       });
       window.scrollTo(0, 0);
-    }, [items]);
+    }, [categoryId, sortType]); // зависимости на изменение категорий или сортировки, если изменения есть  = запросу
 
   return (
     <div className="container">
       <div className="content__top">
-        <Categories />
-        <Sort />
+        <Categories value={categoryId} onChangeCategory={(index)=> setCategoryId(index)} />
+        <Sort value={sortType} onChangeSort={(index)=> setSortType(index)} />
       </div>
       <h2 className="content__title">Все пиццы</h2>
       <div className="content__items">
