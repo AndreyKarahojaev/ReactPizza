@@ -13,6 +13,7 @@ function Sort({value,onChangeSort}) {
     { name: 'алфавиту (ASC)', sortProperty: '-title' }
   ];
   
+
  
   const onClickListItem = (index) => {
     onChangeSort(index);

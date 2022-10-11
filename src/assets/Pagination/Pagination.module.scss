@@ -1,0 +1,44 @@
+.root {
+  display: flex;
+  :global {
+    .selected {
+      box-shadow: inset 1px 1px 10px -1px;
+      background-color: #fe5f1e;
+
+      a {
+        color: white;
+      }
+      &:hover {
+        background-color: #fe5f1e;
+       }
+    }
+
+  }
+  li{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    border: 1px solid  #fe5f1e;
+    border-radius: 30px;
+    margin: 4px;
+    cursor: pointer;
+    
+    &:hover {
+      background-color: #F3F3F3;
+      border-radius: 35px;
+      }
+    &:active {
+      
+      background-color: #fe5f1e;
+    }
+
+    &:not(:first-child ) {
+      width: 45px;
+      height: 45px;
+    }
+    &:nth-last-child(1){
+      min-width: 100px;
+    }
+}
+}
