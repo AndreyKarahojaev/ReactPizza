@@ -1,5 +1,10 @@
 import React from 'react';
-import {SearchContext} from '../App'
+import { SearchContext } from '../App'
+import { useSelector, useDispatch } from 'react-redux';
+
+import { setCategoryId, setCurrentPage } from '../redux/slices/filterSlice';
+
+import axios from 'axios';
 
 import Categories from '../components/Categories';
 import Sort from '../components/Sort';
@@ -8,17 +13,24 @@ import Skeleton from '../components/PizzaBlock/Skeleton';
 import Pagination from '../assets/Pagination';
 
 export const Home = () => {
+  const dispatch = useDispatch(); 
 
-  const {searchValue} = React.useContext(SearchContext)
+  const { currentPage, sort, categoryId } = useSelector((state) => state.filter);
+  
 
+  const {searchValue} = React.useContext(SearchContext);
   const [items, setItems] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(true);
-  const [currentPage, setCurrentPage] = React.useState(1);
-  const [categoryId, setCategoryId] = React.useState(0);
-  const [sortType, setSortType] = React.useState({
-    name: 'популярности',
-    sortProperty: 'rating',
-  });
+
+  // const [categoryId, setCategoryId] = React.useState(0);
+
+  const onChangePage = number => {
+    dispatch(setCurrentPage(number));
+  }
+
+  const onChangeCategory = (id) => { 
+    dispatch(setCategoryId(id))
+  };
 
     //https://6331b2413ea4956cfb652835.mockapi.io/items
 
@@ -26,20 +38,17 @@ export const Home = () => {
       setIsLoading(true);
 
       const category = categoryId > 0 ? `category=${categoryId}` : ''; // генерация категорий
-      const sortBy = sortType.sortProperty.replace('-', ''); // сортирую по параметрам, по умолчаюнию популяр.
-      const order = sortType.sortProperty.includes('-') ? 'asc' : 'desc'; // сортировка по возрастанию и убыванию mocApi
+      const sortBy = sort.sortProperty.replace('-', ''); // сортирую по параметрам, по умолчаюнию популяр.
+      const order = sort.sortProperty.includes('-') ? 'asc' : 'desc'; // сортировка по возрастанию и убыванию mocApi
       const search = searchValue ? `&search=${searchValue}` : '';
-
-      fetch(
-        `https://6331b2413ea4956cfb652835.mockapi.io/items?page=${currentPage}&limit=4&${category}&sortBy=${sortBy}&order=${order}${search}`,
-      )
-        .then((res) => res.json())
-        .then((arr) => {
-        setItems(arr);
-        setIsLoading(false)
+       
+      axios.get(`https://6331b2413ea4956cfb652835.mockapi.io/items?page=${currentPage}&limit=4&${category}&sortBy=${sortBy}&order=${order}${search}`)
+        .then((res) => {
+          setItems(res.data);
+          setIsLoading(false)
       });
       window.scrollTo(0, 0);
-    }, [categoryId, sortType, searchValue,currentPage]); // зависимости на изменение категорий или сортировки, если изменения есть  = запросу
+    }, [categoryId, sort.sortProperty, searchValue, currentPage]); // зависимости на изменение категорий или сортировки, если изменения есть  = запросу
 
   // вариант с поиском через филшьтр 
     // .filter((obj) => {
@@ -66,8 +75,8 @@ export const Home = () => {
   return (
     <div className="container">
       <div className="content__top">
-        <Categories value={categoryId} onChangeCategory={(index)=> setCategoryId(index)} />
-        <Sort value={sortType} onChangeSort={(index)=> setSortType(index)} />
+        <Categories value={categoryId} onChangeCategory={onChangeCategory} />
+        <Sort value={sort} />
       </div>
       <h2 className="content__title">Все пиццы</h2>
       <div className="content__items">
@@ -75,7 +84,7 @@ export const Home = () => {
           isLoading ? sceletons : pizzasPizzaBlock
         }
       </div>
-      <Pagination onChangePage={(number) => setCurrentPage(number)} />
+      <Pagination currentPage={currentPage} onChangePage={onChangePage} />
     </div>
   )
 
